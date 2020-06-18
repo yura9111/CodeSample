@@ -3,34 +3,73 @@
 const PAPER = 1;//1->2
 const ROCK = 2;//2->3
 const SCISSORS = 3;//3->1
+const POSSIBLE_BETS = ["BetPaper", "BetRock", "BetScissors"];
+
+class Bet
+{
+    var $id;
+    var $strongerBets;
+
+    function compare(Bet $bet)
+    {
+        if ($this->id == $bet->id) {
+            return 0;
+        }
+        if (in_array($bet->id, $this->strongerBets)) {
+            return -1;
+        }
+        return 1;
+    }
+}
+
+Class BetPaper extends Bet
+{
+    var $id = PAPER;
+    var $strongerBets = [SCISSORS];
+}
+
+Class BetRock extends Bet
+{
+    var $id = ROCK;
+    var $strongerBets = [PAPER];
+}
+
+Class BetScissors extends Bet
+{
+    var $id = SCISSORS;
+    var $strongerBets = [ROCK];
+}
 
 interface BotInterface
 {
-    function makeChoice();
+    function makeChoice(): Bet;
 }
 
 class BotPaper implements BotInterface
 {
-    function makeChoice()
+    function makeChoice(): Bet
     {
-        return PAPER;
+        return new BetPaper();
     }
 }
 
 class BotRandom implements BotInterface
 {
-    function makeChoice()
+    function makeChoice(): Bet
     {
-        return rand(1, 3);
+        $className = POSSIBLE_BETS[rand(0, count(POSSIBLE_BETS) - 1)];
+        return new $className();
     }
 }
 
 class BotPlayer implements BotInterface
 {
-    function makeChoice()
+    function makeChoice(): Bet
     {
-        print("make your choice 1 = paper 2 = rock 3 = scissors");
-        return readline();
+        print("make your choice, input single digit number, where");
+        print_r(POSSIBLE_BETS);
+        $className = POSSIBLE_BETS[readline()];
+        return new $className();
     }
 }
 
@@ -49,26 +88,9 @@ class Game
 
     function playRound()
     {
-        $result = $this->compareBets($this->playerA->makeChoice(), $this->playerB->makeChoice());
+        $result = $this->playerA->makeChoice()->compare($this->playerB->makeChoice());
         $this->history[] = $result;
         $this->score += $result;
-    }
-
-    function compareBets(int $betA, int $betB): int
-    {
-        if ($betA == $betB) {
-            return 0;
-        }
-        if ($betA == PAPER && $betB == ROCK) {
-            return 1;
-        }
-        if ($betA == ROCK && $betB == SCISSORS) {
-            return 1;
-        }
-        if ($betA == SCISSORS && $betB == PAPER) {
-            return 1;
-        }
-        return -1;
     }
 }
 

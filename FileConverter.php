@@ -33,11 +33,11 @@ class FileConverter
             $transitionFilePath[count($transitionFilePath) - 1] = $transitionFormat;
             $transitionFilePath = implode('.', $transitionFilePath);
             if ($toFormat === $transitionFormat) {
-                $this->exec("sudo doc2odt $fromFile");
+                $this->exec("doc2odt $fromFile");
             } else {
                 //convert to odt => convert from odt to $format
                 if (!file_exists($transitionFilePath)) {
-                    $this->exec("sudo doc2odt $fromFile");
+                    $this->exec("doc2odt $fromFile");
                 }
                 $this->exec("ebook-convert $transitionFilePath $toFile --enable-heuristics");
             }
